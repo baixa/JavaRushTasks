@@ -4,6 +4,18 @@ import java.math.BigInteger;
 
 /* 
 Конвертер систем счислений
+Реализуй логику метода convertNumberToOtherNumberSystem, который должен переводить число number.getDigit(), из одной системы счисления (numberSystem) в другую (expectedNumberSystem).
+Брось NumberFormatException, если переданное число некорректно, например, число "120" с системой счисления 2.
+Валидация для - number.getDigit() - целое не отрицательное.
+Метод main не участвует в тестировании.
+
+
+Requirements:
+1. Метод convertNumberToOtherNumberSystem (Number, NumberSystem), возвращающий тип Number, должен существовать.
+2. Должно бросаться исключение NumberFormatException, если переданное число некорректно в заданной системе счисления.
+3. Необходимо корректно реализовать метод convertNumberToOtherNumberSystem - перевод числа в указанную систему счисления.
+4. Enum NumberSystemType должен поддерживать интерфейс NumberSystem.
+5. В enum-е NumberSystemType должно присутствовать 11 значений оснований систем счисления. Основания: 2, 3, 4, 5, 6, 7, 8, 9, 10, 12 и 16.
 */
 
 public class Solution {
@@ -21,8 +33,12 @@ public class Solution {
         System.out.println(result);    //expected abcdefabcdef
     }
 
-    public static Number convertNumberToOtherNumberSystem(Number number, NumberSystem expectedNumberSystem) {
-        //напишите тут ваш код
-        return null;
+    public static Number convertNumberToOtherNumberSystem(Number number, NumberSystem expectedNumberSystem) throws NumberFormatException{
+        String digit = number.getDigit();
+        int sysType = number.getNumberSystem().getNumberSystemIntValue();
+        int newSysType = expectedNumberSystem.getNumberSystemIntValue();
+        BigInteger lastNum = new BigInteger(digit, sysType);
+        Number newNumber = new Number(expectedNumberSystem, lastNum.toString(newSysType));
+        return newNumber;
     }
 }
