@@ -34,7 +34,7 @@ public class Solution {
         try {
             BigInteger num = new BigInteger(number);
             Set<Integer> result = new HashSet<>();
-            for (int i = 2; i < 36; i++) {
+            for (int i = 2; i <= 36; i++) {
                 String numNewFormat = num.toString(i);
                 if (numNewFormat.equals((new StringBuilder(numNewFormat)).reverse().toString())) {
                     result.add(i);
