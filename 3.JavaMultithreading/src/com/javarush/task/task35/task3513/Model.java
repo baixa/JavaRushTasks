@@ -117,6 +117,8 @@ public class Model {
 
     //Метод выполняет смещение клеток при перемещении их влево
     public void left() {
+        if (isSaveNeeded)
+            saveState(gameTiles);
         boolean isNeedAddTile = false;
         for (int i = 0; i < FIELD_WIDTH; i++) {
             if (compressTiles(gameTiles[i]) | mergeTiles(gameTiles[i])) {
@@ -126,10 +128,12 @@ public class Model {
         if (isNeedAddTile) {
             addTile();
         }
+        isSaveNeeded = true;
     }
 
     //Метод выполняет смещение клеток при перемещении их вправо
     public void right() {
+        saveState(gameTiles);
         gameTiles = rotateClockwise(gameTiles);
         gameTiles = rotateClockwise(gameTiles);
         left();
@@ -139,6 +143,7 @@ public class Model {
 
     //Метод выполняет смещение клеток при перемещении их вверх
     public void up() {
+        saveState(gameTiles);
         gameTiles = rotateClockwise(gameTiles);
         gameTiles = rotateClockwise(gameTiles);
         gameTiles = rotateClockwise(gameTiles);
@@ -148,6 +153,7 @@ public class Model {
 
     //Метод выполняет смещение клеток при перемещении их вниз
     public void down() {
+        saveState(gameTiles);
         gameTiles = rotateClockwise(gameTiles);
         left();
         gameTiles = rotateClockwise(gameTiles);

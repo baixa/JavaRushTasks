@@ -36,8 +36,15 @@ public class Controller extends KeyAdapter {
     //Обработчик нажатий клавиш
     @Override
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
+        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
             resetGame();
+            return;
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_Z) {
+            model.rollback();
+            return;
+        }
 
         if (!model.canMove())
             view.isGameLost = true;
