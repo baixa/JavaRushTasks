@@ -6,29 +6,25 @@ import java.awt.*;
  * Класс описывает одну плитку
  */
 public class Tile {
-    int value;
+    int value = 0;
 
-    public Tile(int value) {
-        this.value = value;
+    Tile() {
     }
 
-    public Tile() {
-        value = 0;
+    Tile(int num) {
+        value = num;
     }
 
     public boolean isEmpty() {
         return value == 0;
     }
 
-    public Color getFontColor() {
+    Color getFontColor() {
         return value < 16 ? new Color(0x776e65) : new Color(0xf9f6f2);
     }
 
-    /*
-    * Возвращает цвет плитки в зависимости от ее веса
-    * */
-    public Color getTileColor() {
-        switch(value) {
+    Color getTileColor() {
+        switch (value) {
             case 0:
                 return new Color(0xcdc1b4);
             case 2:
@@ -53,6 +49,7 @@ public class Tile {
                 return new Color(0xedc53f);
             case 2048:
                 return new Color(0xedc22e);
+
             default:
                 return new Color(0xff0000);
         }
