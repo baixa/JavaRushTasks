@@ -3,6 +3,7 @@ package com.javarush.task.task35.task3513;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 
 /**
  * Содержит игровую логику и хранит игровое поле
@@ -12,6 +13,9 @@ public class Model {
     private Tile[][] gameTiles;
     int maxTile = 0;
     int score = 0;
+    private boolean isSaveNeeded = true;
+    private Stack<Tile[][]> previousStates = new Stack<>();
+    private Stack<Integer> previousScores = new Stack<>();
 
     public Model() {
         resetGameTiles();
@@ -149,5 +153,46 @@ public class Model {
         gameTiles = rotateClockwise(gameTiles);
         gameTiles = rotateClockwise(gameTiles);
         gameTiles = rotateClockwise(gameTiles);
+    }
+
+    public Tile[][] getGameTiles() {
+        return gameTiles;
+    }
+
+    //Метод возвращает булево значение, описывающее, возможно ли совершить действие, которое изменит игровое поле
+    public boolean canMove() {
+        if (getEmptyTiles().size() == 0) {
+            for (int i = 0; i < gameTiles.length-1; i++) {
+                for (int j = 0; j < gameTiles[i].length-1; j++) {
+                    if (gameTiles[i][j].value == gameTiles[i][j+1].value || gameTiles[i][j].value == gameTiles[i+1][j].value){
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        return true;
+    }
+
+    //Метод сохраняет текущее состояние игры и счет в стек
+    private void saveState(Tile[][] tiles) {
+        Tile[][] currentTiles = new Tile[FIELD_WIDTH][FIELD_WIDTH];
+        for (int i = 0; i < currentTiles.length; i++) {
+            for (int j = 0; j < currentTiles[i].length; j++) {
+                currentTiles[i][j] = new Tile(tiles[i][j].value);
+            }
+        }
+        previousStates.push(currentTiles);
+        previousScores.push(score);
+        isSaveNeeded = false;
+    }
+
+    //Метод возвращает предыдущее игровое состояние
+    public void rollback() {
+        if (previousStates.isEmpty() || previousScores.isEmpty())
+            return;
+
+        gameTiles = previousStates.pop();
+        score = previousScores.pop();
     }
 }
