@@ -150,4 +150,22 @@ public class Model {
         gameTiles = rotateClockwise(gameTiles);
         gameTiles = rotateClockwise(gameTiles);
     }
+
+    public Tile[][] getGameTiles() {
+        return gameTiles;
+    }
+
+    public boolean canMove() {
+        if (getEmptyTiles().size() == 0) {
+            for (int i = 0; i < gameTiles.length-1; i++) {
+                for (int j = 0; j < gameTiles[i].length-1; j++) {
+                    if (gameTiles[i][j].value == gameTiles[i][j+1].value || gameTiles[i][j].value == gameTiles[i+1][j].value){
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        return true;
+    }
 }
