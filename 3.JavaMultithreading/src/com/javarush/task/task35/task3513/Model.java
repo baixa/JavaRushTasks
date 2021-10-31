@@ -54,24 +54,24 @@ public class Model {
     //Метод проводит сжатие плиток путем перемещения пустых плиток вправо
     private boolean compressTiles(Tile[] tiles) {
         int insertPosition = 0;
-        boolean isArrayChanged = false;
+        boolean result = false;
         for (int i = 0; i < FIELD_WIDTH; i++) {
             if (!tiles[i].isEmpty()) {
                 if (i != insertPosition) {
                     tiles[insertPosition] = tiles[i];
                     tiles[i] = new Tile();
-                    isArrayChanged = true;
+                    result = true;
                 }
                 insertPosition++;
             }
         }
-        return isArrayChanged;
+        return result;
     }
 
     //Метод проводит слияние плиток одного номинала
     private boolean mergeTiles(Tile[] tiles) {
+        boolean result = false;
         LinkedList<Tile> tilesList = new LinkedList<>();
-        boolean isArrayChanged = false;
         for (int i = 0; i < FIELD_WIDTH; i++) {
             if (tiles[i].isEmpty()) {
                 continue;
@@ -85,7 +85,7 @@ public class Model {
                 score += updatedValue;
                 tilesList.addLast(new Tile(updatedValue));
                 tiles[i + 1].value = 0;
-                isArrayChanged = true;
+                result = true;
             } else {
                 tilesList.addLast(new Tile(tiles[i].value));
             }
@@ -95,11 +95,23 @@ public class Model {
         for (int i = 0; i < tilesList.size(); i++) {
             tiles[i] = tilesList.get(i);
         }
-        
-        return isArrayChanged;
+
+        return result;
     }
 
-    //Метод вызывает для каждой строки методы сжатия и слияния и добавляет в случае необходимости одну плитку
+    //Поворачиваем массив по часовой стрелке на 90 градусов
+    private Tile[][] rotateClockwise(Tile[][] tiles) {
+        final int N = tiles.length;
+        Tile[][] result = new Tile[N][N];
+        for (int r = 0; r < N; r++) {
+            for (int c = 0; c < N; c++) {
+                result[c][N - 1 - r] = tiles[r][c];
+            }
+        }
+        return result;
+    }
+
+    //Метод выполняет смещение клеток при перемещении их влево
     public void left() {
         boolean isNeedAddTile = false;
         for (int i = 0; i < FIELD_WIDTH; i++) {
@@ -110,5 +122,32 @@ public class Model {
         if (isNeedAddTile) {
             addTile();
         }
+    }
+
+    //Метод выполняет смещение клеток при перемещении их вправо
+    public void right() {
+        gameTiles = rotateClockwise(gameTiles);
+        gameTiles = rotateClockwise(gameTiles);
+        left();
+        gameTiles = rotateClockwise(gameTiles);
+        gameTiles = rotateClockwise(gameTiles);
+    }
+
+    //Метод выполняет смещение клеток при перемещении их вверх
+    public void up() {
+        gameTiles = rotateClockwise(gameTiles);
+        gameTiles = rotateClockwise(gameTiles);
+        gameTiles = rotateClockwise(gameTiles);
+        left();
+        gameTiles = rotateClockwise(gameTiles);
+    }
+
+    //Метод выполняет смещение клеток при перемещении их вниз
+    public void down() {
+        gameTiles = rotateClockwise(gameTiles);
+        left();
+        gameTiles = rotateClockwise(gameTiles);
+        gameTiles = rotateClockwise(gameTiles);
+        gameTiles = rotateClockwise(gameTiles);
     }
 }
