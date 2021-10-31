@@ -213,6 +213,7 @@ public class Model {
         }
     }
 
+    //Случайный ход
     void randomMove() {
         int n = ((int) (Math.random() * 100)) % 4;
         switch (n) {
@@ -229,5 +230,28 @@ public class Model {
                 right();
                 break;
         }
+    }
+
+    //Метод оценивает общий вес плиток на поле
+    private MoveEfficiency getMoveEfficiency(Move move) {
+        MoveEfficiency moveEfficiency = new MoveEfficiency(-1, 0, move);
+        move.move();
+        if (hasBoardChanged()) {
+            moveEfficiency = new MoveEfficiency(getEmptyTilesCount(), score, move);
+        }
+        rollback();
+        return moveEfficiency;
+    }
+
+    //Метод проверяет, изменился ли вес плиток с последнего хода
+    private boolean hasBoardChanged() {
+        for (int i = 0; i < FIELD_WIDTH; i++) {
+            for (int j = 0; j < FIELD_WIDTH; j++) {
+                if (gameTiles[i][j].value != previousStates.peek()[i][j].value) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
