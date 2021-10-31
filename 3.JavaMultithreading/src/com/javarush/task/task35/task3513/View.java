@@ -36,7 +36,7 @@ public class View extends JPanel {
         if (isGameWon) {
             JOptionPane.showMessageDialog(this, "You've won!");
         } else if (isGameLost) {
-            JOptionPane.showMessageDialog(this, "You've lost :(");
+            JOptionPane.showMessageDialog(null, "Ты проиграл :(");
         }
     }
 
