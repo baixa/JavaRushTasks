@@ -155,6 +155,7 @@ public class Model {
         return gameTiles;
     }
 
+    //Метод возвращает булево значение, описывающее, возможно ли совершить действие, которое изменит игровое поле
     public boolean canMove() {
         if (getEmptyTiles().size() == 0) {
             for (int i = 0; i < gameTiles.length-1; i++) {
