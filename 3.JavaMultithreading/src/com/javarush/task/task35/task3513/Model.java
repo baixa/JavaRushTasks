@@ -1,17 +1,14 @@
 package com.javarush.task.task35.task3513;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * Содержит игровую логику и хранит игровое поле
  */
 public class Model {
-    private static final int FIELD_WIDTH = 4;
     private Tile[][] gameTiles;
-    int maxTile = 0;
+    private static final int FIELD_WIDTH = 4;
+    int maxTile = 2;
     int score = 0;
     private boolean isSaveNeeded = true;
     private Stack<Tile[][]> previousStates = new Stack<>();
@@ -21,6 +18,10 @@ public class Model {
         resetGameTiles();
     }
 
+    Tile[][] getGameTiles() {
+        return gameTiles;
+    }
+    
     //Создает новое игровое поле
     void resetGameTiles() {
         gameTiles = new Tile[FIELD_WIDTH][FIELD_WIDTH];
@@ -45,7 +46,7 @@ public class Model {
 
     //Метод возвращает пустые клетки
     private List<Tile> getEmptyTiles() {
-        final List<Tile> list = new ArrayList<>();
+        final List<Tile> list = new ArrayList<Tile>();
         for (Tile[] tileArray : gameTiles) {
             for (Tile t : tileArray)
                 if (t.isEmpty()) {
@@ -117,19 +118,24 @@ public class Model {
 
     //Метод выполняет смещение клеток при перемещении их влево
     public void left() {
-        boolean isNeedAddTile = false;
+        if (isSaveNeeded) {
+            saveState(gameTiles);
+        }
+        boolean moveFlag = false;
         for (int i = 0; i < FIELD_WIDTH; i++) {
             if (compressTiles(gameTiles[i]) | mergeTiles(gameTiles[i])) {
-                isNeedAddTile = true;
+                moveFlag = true;
             }
         }
-        if (isNeedAddTile) {
+        if (moveFlag) {
             addTile();
         }
+        isSaveNeeded = true;
     }
 
     //Метод выполняет смещение клеток при перемещении их вправо
     public void right() {
+        saveState(gameTiles);
         gameTiles = rotateClockwise(gameTiles);
         gameTiles = rotateClockwise(gameTiles);
         left();
@@ -139,6 +145,7 @@ public class Model {
 
     //Метод выполняет смещение клеток при перемещении их вверх
     public void up() {
+        saveState(gameTiles);
         gameTiles = rotateClockwise(gameTiles);
         gameTiles = rotateClockwise(gameTiles);
         gameTiles = rotateClockwise(gameTiles);
@@ -148,6 +155,7 @@ public class Model {
 
     //Метод выполняет смещение клеток при перемещении их вниз
     public void down() {
+        saveState(gameTiles);
         gameTiles = rotateClockwise(gameTiles);
         left();
         gameTiles = rotateClockwise(gameTiles);
@@ -155,44 +163,104 @@ public class Model {
         gameTiles = rotateClockwise(gameTiles);
     }
 
-    public Tile[][] getGameTiles() {
-        return gameTiles;
+    private int getEmptyTilesCount() {
+        return getEmptyTiles().size();
+    }
+
+    private boolean isFull() {
+        return getEmptyTilesCount() == 0;
     }
 
     //Метод возвращает булево значение, описывающее, возможно ли совершить действие, которое изменит игровое поле
-    public boolean canMove() {
-        if (getEmptyTiles().size() == 0) {
-            for (int i = 0; i < gameTiles.length-1; i++) {
-                for (int j = 0; j < gameTiles[i].length-1; j++) {
-                    if (gameTiles[i][j].value == gameTiles[i][j+1].value || gameTiles[i][j].value == gameTiles[i+1][j].value){
-                        return true;
-                    }
+    boolean canMove() {
+        if (!isFull()) {
+            return true;
+        }
+
+        for (int x = 0; x < FIELD_WIDTH; x++) {
+            for (int y = 0; y < FIELD_WIDTH; y++) {
+                Tile t = gameTiles[x][y];
+                if ((x < FIELD_WIDTH - 1 && t.value == gameTiles[x + 1][y].value)
+                        || ((y < FIELD_WIDTH - 1) && t.value == gameTiles[x][y + 1].value)) {
+                    return true;
                 }
             }
-            return false;
         }
-        return true;
+        return false;
     }
 
     //Метод сохраняет текущее состояние игры и счет в стек
     private void saveState(Tile[][] tiles) {
-        Tile[][] currentTiles = new Tile[FIELD_WIDTH][FIELD_WIDTH];
-        for (int i = 0; i < currentTiles.length; i++) {
-            for (int j = 0; j < currentTiles[i].length; j++) {
-                currentTiles[i][j] = new Tile(tiles[i][j].value);
+        Tile[][] tempTiles = new Tile[FIELD_WIDTH][FIELD_WIDTH];
+        for (int i = 0; i < FIELD_WIDTH; i++) {
+            for (int j = 0; j < FIELD_WIDTH; j++) {
+                tempTiles[i][j] = new Tile(tiles[i][j].value);
             }
         }
-        previousStates.push(currentTiles);
+        previousStates.push(tempTiles);
         previousScores.push(score);
         isSaveNeeded = false;
     }
 
     //Метод возвращает предыдущее игровое состояние
     public void rollback() {
-        if (previousStates.isEmpty() || previousScores.isEmpty())
-            return;
+        if (!previousStates.isEmpty() && !previousScores.isEmpty()) {
+            gameTiles = previousStates.pop();
+            score = previousScores.pop();
+        }
+    }
 
-        gameTiles = previousStates.pop();
-        score = previousScores.pop();
+    //Случайный ход
+    void randomMove() {
+        int n = ((int) (Math.random() * 100)) % 4;
+        switch (n) {
+            case 0:
+                left();
+                break;
+            case 1:
+                up();
+                break;
+            case 2:
+                down();
+                break;
+            case 3:
+                right();
+                break;
+        }
+    }
+
+    //Метод оценивает общий вес плиток на поле
+    private MoveEfficiency getMoveEfficiency(Move move) {
+        MoveEfficiency moveEfficiency = new MoveEfficiency(-1, 0, move);
+        move.move();
+        if (hasBoardChanged()) {
+            moveEfficiency = new MoveEfficiency(getEmptyTilesCount(), score, move);
+        }
+        rollback();
+        return moveEfficiency;
+    }
+
+    //Метод проверяет, изменился ли вес плиток с последнего хода
+    private boolean hasBoardChanged() {
+        for (int i = 0; i < FIELD_WIDTH; i++) {
+            for (int j = 0; j < FIELD_WIDTH; j++) {
+                if (gameTiles[i][j].value != previousStates.peek()[i][j].value) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    //Метод выбирает лучший из возможных ходов и реализует его
+    void autoMove() {
+        PriorityQueue<MoveEfficiency> moveEfficiencies = new PriorityQueue<>(4, Collections.reverseOrder());
+
+        moveEfficiencies.offer(getMoveEfficiency(this::left));
+        moveEfficiencies.offer(getMoveEfficiency(this::up));
+        moveEfficiencies.offer(getMoveEfficiency(this::right));
+        moveEfficiencies.offer(getMoveEfficiency(this::down));
+
+        moveEfficiencies.peek().getMove().move();
     }
 }
