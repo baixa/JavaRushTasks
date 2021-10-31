@@ -1,5 +1,6 @@
 package com.javarush.task.task35.task3513;
 
+import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
@@ -43,10 +44,18 @@ public class Controller extends KeyAdapter {
 
         if (!view.isGameLost && !view.isGameWon) {
             switch (e.getKeyCode()) {
-                case KeyEvent.VK_LEFT -> model.left();
-                case KeyEvent.VK_RIGHT -> model.right();
-                case KeyEvent.VK_UP -> model.up();
-                case KeyEvent.VK_DOWN -> model.down();
+                case KeyEvent.VK_LEFT:
+                    model.left();
+                    break;
+                case KeyEvent.VK_RIGHT:
+                    model.right();
+                    break;
+                case KeyEvent.VK_UP:
+                    model.up();
+                    break;
+                case KeyEvent.VK_DOWN:
+                    model.down();
+                    break;
             }
         }
 
@@ -54,5 +63,9 @@ public class Controller extends KeyAdapter {
             view.isGameWon = true;
 
         view.repaint();
+    }
+
+    public View getView() {
+        return view;
     }
 }
