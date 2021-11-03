@@ -31,12 +31,12 @@ public class Solution {
         if (d != null && d.cs != null && d.cs.size() > 0 && d.cs.get(0).bs != null &&d.cs.get(0).bs.size() > 0 &&
                 d.cs.get(0).bs.get(0).as != null && d.cs.get(0).bs.get(0).as.size() > 0 && d.cs.get(0).bs.get(0).as.get(0).flag) {
             System.out.println("A's flag is true");
-        } else { //all other cases
+        } else { //all others case
             System.out.println("Oops!");
         }
     }
 
-    static class A {
+    public static class A {
         boolean flag = true;
     }
 
